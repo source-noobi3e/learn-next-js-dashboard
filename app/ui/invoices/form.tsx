@@ -1,4 +1,5 @@
-import { CustomerField } from '@/app/lib/definitions';
+'use client';
+import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
 import Link from 'next/link';
 import {
   CheckIcon,
@@ -8,9 +9,19 @@ import {
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 
-export default function Form({ customers }: { customers: CustomerField[] }) {
+export default function Form({
+  customers,
+  invoice,
+  action,
+  btnTitle,
+}: {
+  invoice?: InvoiceForm;
+  customers: CustomerField[];
+  btnTitle: string;
+  action: (formData: FormData) => Promise<void>;
+}) {
   return (
-    <form>
+    <form action={action || ''}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -22,7 +33,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               id="customer"
               name="customerId"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue=""
+              defaultValue={invoice?.customer_id || ''}
             >
               <option value="" disabled>
                 Select a customer
@@ -49,6 +60,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                 name="amount"
                 type="number"
                 step="0.01"
+                defaultValue={invoice?.amount}
                 placeholder="Enter USD amount"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
@@ -66,6 +78,9 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
             <div className="flex gap-4">
               <div className="flex items-center">
                 <input
+                  defaultChecked={
+                    invoice?.status && invoice.status === 'pending'
+                  }
                   id="pending"
                   name="status"
                   type="radio"
@@ -81,6 +96,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               </div>
               <div className="flex items-center">
                 <input
+                  defaultChecked={invoice?.status && invoice.status === 'paid'}
                   id="paid"
                   name="status"
                   type="radio"
@@ -105,7 +121,9 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <Button type="submit" className="capitalize">
+          {btnTitle}
+        </Button>
       </div>
     </form>
   );
